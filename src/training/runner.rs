@@ -1,5 +1,6 @@
 use crate::traits::{Agent, Env, EpisodeResult, Observation, RunStats};
 use std::time::Instant;
+use std::io::{self, Write};
 
 pub struct Runner;
 
@@ -13,7 +14,7 @@ impl Runner {
         loop {
             let legal_actions = env.legal_action();
             let t0 = Instant::now();
-            let action = agent.select_action(&observation, &legal_actions);
+            let action = agent.select_action(&observation, legal_actions, Some(&*env));
             total_move_time_ms = total_move_time_ms + t0.elapsed().as_secs_f64() * 1000.0;
 
             let (next_observation, reward, is_done) = env.step(action);
@@ -42,12 +43,18 @@ impl Runner {
         let mut steps = Vec::with_capacity(n);
         let mut times = Vec::with_capacity(n);
 
-        for _ in 0..n {
+        for i in 0..n {
+            print!("\r  Episode {}/{}", i, n);
+            io::stdout().flush().unwrap();
             let res = Self::run_episode(env, agent, eval_mode);
             scores.push(res.score);
             steps.push(res.num_steps);
             times.push(res.move_time_ms);
         }
+
+        print!("\r{}", " ".repeat(40));
+        print!("\r");
+        io::stdout().flush().unwrap();
 
         RunStats {
             mean_score: mean(&scores),

@@ -1,7 +1,6 @@
 use crate::traits::{Action, Env, Observation, Reward};
 
-const ACTIONS: &[Action] = &[0, 1];
-
+#[derive(Clone)]
 pub struct LineWorld {
     /// Number of cells
     size: usize,
@@ -23,7 +22,7 @@ pub struct LineWorld {
 
     /// Score
     final_score: f32,
-    
+
     /// Is going out of the board is killing the player
     out_of_bounds_is_killing: bool,
 }
@@ -102,8 +101,8 @@ impl Env for LineWorld {
         (self.pos_to_observation(), -0.01, false)
     }
 
-    fn legal_action(&self) -> &[Action] {
-        ACTIONS
+    fn legal_action(&self) -> Vec<Action> {
+        vec![0, 1]
     }
 
     fn is_game_over(&self) -> bool {
@@ -124,5 +123,9 @@ impl Env for LineWorld {
 
     fn score(&self, player: usize) -> f32 {
         self.final_score
+    }
+
+    fn clone_env(&self) -> Box<dyn Env> {
+        Box::new(self.clone())
     }
 }

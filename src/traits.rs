@@ -1,3 +1,5 @@
+use std::ptr::null;
+
 /// Flat float vector for neural network
 pub type Observation = Vec<f32>;
 
@@ -15,7 +17,7 @@ pub trait Env {
     fn step(&mut self, action: Action) -> (Observation, Reward, bool);
 
     /// List of all legal actions
-    fn legal_action(&self) -> &[Action];
+    fn legal_action(&self) -> Vec<Action>;
 
     /// Return true if game is over, else false
     fn is_game_over(&self) -> bool;
@@ -31,11 +33,14 @@ pub trait Env {
 
     /// Score of a player at the end of game
     fn score(&self, player: usize) -> f32;
+
+    /// Clone env
+    fn clone_env(&self) -> Box<dyn Env>;
 }
 
 pub trait Agent {
     /// Give current obs and legal actions, return the chosen action
-    fn select_action(&mut self, observation: &Observation, legal_actions: &[Action]) -> Action;
+    fn select_action(&mut self, observation: &Observation, legal_actions: Vec<Action>, env: Option<&dyn Env>) -> Action;
 }
 
 pub trait TrainableAgent: Agent {
