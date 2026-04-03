@@ -1,5 +1,5 @@
-use burn::tensor::Slice;
 use crate::traits::{Action, Env, Observation, Reward};
+use burn::tensor::Slice;
 
 #[derive(Clone)]
 pub struct GridWorld {
@@ -10,29 +10,34 @@ pub struct GridWorld {
     height: usize,
 
     /// Position of the agent
-    agent_pos : (usize, usize),
+    agent_pos: (usize, usize),
 
     /// Starting pos for reset
-    starting_pos : (usize, usize),
+    starting_pos: (usize, usize),
 
     /// Current step
-    current_step : usize,
+    current_step: usize,
 
     /// Max step for an episode
-    max_steps : usize,
+    max_steps: usize,
 
     /// Is the game finished
-    game_over : bool,
+    game_over: bool,
 
     /// Final score
-    final_score : f32,
+    final_score: f32,
 
     /// Is going out of the board is killing the player
     out_of_bounds_is_killing: bool,
 }
 
 impl GridWorld {
-    pub fn new(width: usize, height: usize, max_steps: usize, out_of_bounds_is_killing: bool) -> Self {
+    pub fn new(
+        width: usize,
+        height: usize,
+        max_steps: usize,
+        out_of_bounds_is_killing: bool,
+    ) -> Self {
         Self {
             width,
             height,
@@ -135,10 +140,8 @@ impl Env for GridWorld {
                         self.agent_pos.0 += 1;
                     }
                 }
-
             }
             _ => panic!("Unhandled action {}", action),
-
         }
 
         if self.agent_pos == (self.width - 1, self.height - 1) {

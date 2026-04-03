@@ -40,7 +40,12 @@ pub trait Env {
 
 pub trait Agent {
     /// Give current obs and legal actions, return the chosen action
-    fn select_action(&mut self, observation: &Observation, legal_actions: Vec<Action>, env: Option<&dyn Env>) -> Action;
+    fn select_action(
+        &mut self,
+        observation: &Observation,
+        legal_actions: Vec<Action>,
+        env: Option<&dyn Env>,
+    ) -> Action;
 }
 
 pub trait TrainableAgent: Agent {
@@ -64,12 +69,14 @@ pub struct Transition {
 
 pub struct EpisodeResult {
     pub score: f32,
+    pub score_player_2: f32,
     pub num_steps: usize,
     pub move_time_ms: f64, // Average time for a step
 }
 
 pub struct RunStats {
     pub mean_score: f32,
+    pub mean_score_player_2: f32,
     pub mean_steps: f32,
     pub mean_move_time_ms: f64,
     pub n_episodes: usize,

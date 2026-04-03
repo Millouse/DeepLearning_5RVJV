@@ -28,7 +28,12 @@ pub struct LineWorld {
 }
 
 impl LineWorld {
-    pub fn new(size: usize, start_pos: usize, max_steps: usize, out_of_bounds_is_killing: bool) -> Self {
+    pub fn new(
+        size: usize,
+        start_pos: usize,
+        max_steps: usize,
+        out_of_bounds_is_killing: bool,
+    ) -> Self {
         Self {
             size,
             agent_pos: start_pos,
