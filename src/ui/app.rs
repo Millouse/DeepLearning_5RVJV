@@ -1,10 +1,12 @@
 use macroquad::prelude::*;
+use crate::ui::assets::load_assets;
+use crate::ui::render::draw_board;
 
 pub async fn run_ui() {
+    let assets = load_assets().await;
+    
     loop {
-        clear_background(LIGHTGRAY);
-
-        draw_text("Pond UI", 20.0, 40.0, 40.0, BLACK);
+        draw_board(&assets);
 
         next_frame().await;
     }
