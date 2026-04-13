@@ -5,4 +5,5 @@ edition = "2024"
 
 [dependencies]
 burn = { version = "0.20.1", features = ["wgpu"] }
+macroquad = "0.4.14"
 rand = "0.10.0"
