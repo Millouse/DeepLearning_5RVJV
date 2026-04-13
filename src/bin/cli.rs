@@ -1,17 +1,11 @@
-mod agents;
-mod environments;
-mod training;
-mod traits;
-mod ui;
-
-use crate::agents::random::RandomAgent;
-use crate::agents::random_rollout::RandomRolloutAgent;
-use crate::agents::mcts::MCTS;
-use crate::environments::grid_world::GridWorld;
-use crate::environments::line_world::LineWorld;
-use crate::environments::tictactoe::TicTacToe;
-use crate::training::runner::Runner;
-use crate::traits::Env;
+use DeepLearning::agents::random::RandomAgent;
+use DeepLearning::agents::random_rollout::RandomRolloutAgent;
+use DeepLearning::agents::mcts::MCTS;
+use DeepLearning::environments::grid_world::GridWorld;
+use DeepLearning::environments::line_world::LineWorld;
+use DeepLearning::environments::tictactoe::TicTacToe;
+use DeepLearning::training::runner::Runner;
+use DeepLearning::traits::Env;
 use burn::backend::Wgpu;
 use burn::tensor::Tensor;
 
