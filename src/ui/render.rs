@@ -1,9 +1,35 @@
-use macroquad::miniquad::window::set_window_size;
+use std::process::id;
 use macroquad::prelude::*;
 use crate::ui::assets::Assets;
 
+pub struct BoardPosition{
+    pub id: i32,
+    pub ligne: i32,
+    pub colonne: i32,
+    pub screen_x: f32,
+    pub screen_y: f32
+}
+
 pub fn draw_background(assets: &Assets){
     draw_texture(&assets.background, 0.0, 0.0, WHITE);
+}
+
+// Positions des losanges
+pub fn board_positions(board_x: f32, board_y: f32, cell_size: f32) -> Vec<BoardPosition>{
+    let mut positions = Vec::new();
+    let mut id = 0;
+
+    for colonne in 0..4{
+        for ligne in 0..4{
+            let screen_x = board_x + cell_size + ligne as f32 * cell_size;
+            let screen_y = board_y + cell_size + colonne as f32 * cell_size;
+
+            positions.push(BoardPosition { id, ligne, colonne, screen_x, screen_y });
+
+            id += 1;
+        }
+    }
+    positions
 }
 
 // Textures bois
@@ -45,14 +71,11 @@ pub fn draw_board(assets: &Assets) {
         draw_line(x1_ligne_h, y_ligne_h, x2_ligne_h, y_ligne_h, 2.0, DARKBROWN);
     }
 
-    // Losanges
-    for ligne in 0..4{
-        let y_poly = board_y + 100.0 + ligne as f32 * cell_size;
+    // Dessin des losanges
+    let losanges = board_positions(board_x, board_y, cell_size);
 
-        for colonne in 0..4{
-            let x_poly = board_x + 100.0 + colonne as f32 * cell_size;
-
-            draw_poly(x_poly, y_poly, 4, 25.0, 0.0, DARKBROWN);
-        }
+    for losange in losanges{
+        draw_poly(losange.screen_x, losange.screen_y, 4, 25.0, 0.0, DARKBROWN);
+        draw_text(&losange.id.to_string(), losange.screen_x, losange.screen_y, 30.0, WHITE);
     }
 }
