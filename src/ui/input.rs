@@ -1,4 +1,6 @@
 use macroquad::prelude::*;
+use macroquad::ui::widgets;
+use macroquad::ui::widgets::Button;
 use crate::ui::render::board_positions;
 
 pub fn losange_clicked(board_x: f32, board_y: f32, cell_size: f32) -> Option<i32> {
@@ -34,7 +36,11 @@ pub fn losange_hovered(board_x: f32, board_y: f32, cell_size: f32)  {
         let distance = (delta_x * delta_x + delta_y * delta_y).sqrt();
 
         if distance <= 50.0{
-            draw_rectangle(losange.screen_x - 50.0, losange.screen_y - 50.0, cell_size, cell_size, Color::from_rgba(0, 255, 255, 128));
+            draw_rectangle(losange.screen_x - 40.0, losange.screen_y - 40.0, cell_size - 20.0, cell_size - 20.0, Color::from_rgba(0, 255, 255, 128));
         }
     }
+}
+
+pub fn place_egg(board_x: f32, board_y: f32, cell_size: f32)  {
+
 }
