@@ -1,10 +1,8 @@
-#![recursion_limit = "256"]
-
 mod agents;
 mod environments;
-mod models;
 mod training;
 mod traits;
+mod ui;
 
 use crate::agents::mcts::MCTS;
 use crate::agents::random::RandomAgent;
