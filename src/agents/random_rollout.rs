@@ -1,8 +1,13 @@
-use crate::traits::{Action, Agent, Env, Observation};
+use crate::traits::{Action, Agent, Env, Observation, TrainableAgent};
 use rand::{RngExt, rng};
 
 pub struct RandomRolloutAgent {
     n_simulations: usize,
+}
+
+impl TrainableAgent for RandomRolloutAgent {
+    fn store_reward(&mut self, _reward: f32) {}
+    fn train_step(&mut self) {}
 }
 
 impl RandomRolloutAgent {

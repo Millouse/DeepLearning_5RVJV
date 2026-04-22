@@ -49,8 +49,8 @@ pub trait Agent {
 }
 
 pub trait TrainableAgent: Agent {
-    /// Store the transition
-    fn store_transition(&mut self, transition: Transition);
+    /// Store the reward
+    fn store_reward(&mut self, reward: f32);
 
     /// Train step
     fn train_step(&mut self);

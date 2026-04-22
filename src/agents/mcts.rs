@@ -56,10 +56,7 @@ pub struct MCTS {
 
 impl MCTS {
     pub fn new(n_simulations: usize, c: f32) -> Self {
-        MCTS {
-            n_simulations,
-            c,
-        }
+        MCTS { n_simulations, c }
     }
 
     fn select<'a>(&self, node: &'a mut MCTSNode, env: &mut Box<dyn Env>) -> &'a mut MCTSNode {
@@ -109,7 +106,7 @@ impl MCTS {
         env.score(player)
     }
 
-   fn backpropagate(node: &mut MCTSNode, value: f32, root_player: usize) {
+    fn backpropagate(node: &mut MCTSNode, value: f32, root_player: usize) {
         node.visits += 1;
 
         if node.current_player == root_player {
@@ -135,7 +132,8 @@ impl MCTS {
             if cloned_env.is_game_over() || !node_ref.is_fully_expanded() {
                 break;
             }
-            let best_idx = node_ref.children
+            let best_idx = node_ref
+                .children
                 .iter()
                 .enumerate()
                 .max_by(|(_, a), (_, b)| {
@@ -163,16 +161,23 @@ impl MCTS {
         // BACKPROPAGATE — remonter le chemin
         let mut node = &mut *root;
         node.visits += 1;
-        node.total_value += if node.current_player == root_player { value } else { -value };
+        node.total_value += if node.current_player == root_player {
+            value
+        } else {
+            -value
+        };
 
         for idx in path {
             node = &mut node.children[idx];
             node.visits += 1;
-            node.total_value += if node.current_player == root_player { value } else { -value };
+            node.total_value += if node.current_player == root_player {
+                value
+            } else {
+                -value
+            };
         }
     }
 }
-
 
 impl Agent for MCTS {
     fn select_action(

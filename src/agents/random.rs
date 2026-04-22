@@ -1,7 +1,12 @@
-use crate::traits::{Action, Agent, Env, Observation};
+use crate::traits::{Action, Agent, Env, Observation, TrainableAgent};
 use rand::{RngExt, rng};
 
 pub struct RandomAgent;
+
+impl TrainableAgent for RandomAgent {
+    fn store_reward(&mut self, _reward: f32) {}
+    fn train_step(&mut self) {}
+}
 
 impl Agent for RandomAgent {
     fn select_action(
