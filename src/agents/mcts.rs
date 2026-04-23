@@ -126,7 +126,7 @@ impl MCTS {
         let mut cloned_env = env.clone_env();
         let mut path: Vec<usize> = vec![]; // indices des enfants choisis
 
-        // SELECT — descendre avec indices
+        // SELECT
         let mut node_ref = &mut *root;
         loop {
             if cloned_env.is_game_over() || !node_ref.is_fully_expanded() {
@@ -158,7 +158,7 @@ impl MCTS {
         // SIMULATE
         let value = Self::simulate(&mut cloned_env, root_player);
 
-        // BACKPROPAGATE — remonter le chemin
+        // BACKPROPAGATE
         let mut node = &mut *root;
         node.visits += 1;
         node.total_value += if node.current_player == root_player {

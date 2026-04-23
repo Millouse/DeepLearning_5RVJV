@@ -1,6 +1,6 @@
+use DeepLearning::agents::mcts::MCTS;
 use DeepLearning::agents::random::RandomAgent;
 use DeepLearning::agents::random_rollout::RandomRolloutAgent;
-use DeepLearning::agents::mcts::MCTS;
 use DeepLearning::environments::grid_world::GridWorld;
 use DeepLearning::environments::line_world::LineWorld;
 use DeepLearning::environments::tictactoe::TicTacToe;
@@ -97,5 +97,3 @@ fn main() {
         random_vs_mcts_tictactoe();
     }
 }
-
-

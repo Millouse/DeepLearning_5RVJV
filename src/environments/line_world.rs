@@ -84,6 +84,7 @@ impl Env for LineWorld {
                     }
                 }
             }
+            // Goes to right
             1 => {
                 self.agent_pos += 1;
             }

@@ -1,5 +1,5 @@
 pub mod app;
-pub mod render;
-pub mod input;
-pub mod state;
 pub mod assets;
+pub mod input;
+pub mod render;
+pub mod state;
