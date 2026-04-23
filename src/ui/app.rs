@@ -1,6 +1,8 @@
 use crate::ui::assets::load_assets;
 use crate::ui::input::{losange_clicked, losange_hovered};
 use crate::ui::render::{board_positions, draw_board};
+use crate::traits::{Env, Action};
+use crate::environments::pond::Pond;
 use macroquad::miniquad::window::set_window_size;
 use macroquad::prelude::*;
 use macroquad::ui::root_ui;
@@ -8,6 +10,7 @@ use macroquad::ui::root_ui;
 pub async fn run_ui() {
     let assets = load_assets().await;
     let mut selected_losange: Option<i32> = None;
+    let mut pond = Pond::new();
     set_window_size(1280, 720);
 
     loop {
@@ -25,7 +28,7 @@ pub async fn run_ui() {
         draw_board(&assets);
 
         let losanges = board_positions(board_x, board_y, cell_size);
-        for losange in losanges {
+        for losange in &losanges {
             if selected_losange == Some(losange.id) {
                 draw_rectangle(
                     losange.screen_x - 40.0,
@@ -37,15 +40,25 @@ pub async fn run_ui() {
             }
         }
 
+        // Pas de sélection = hover possible
         if selected_losange.is_none() {
             losange_hovered(board_x, board_y, cell_size);
         }
 
+        // Placer un oeuf
         if selected_losange.is_some() {
             if root_ui().button(vec2(30.0, 70.0), "Placer un oeuf") {
-                selected_losange = None;
+                if let Some(id) = selected_losange {
+                    let action = id as Action;
+                    let actions = pond.legal_action();
+                    if actions.contains(&action) {
+                        pond.step(action);
+                        selected_losange = None;
+                    }
+                }
             }
 
+            // Annuler la sélection
             if root_ui().button(vec2(30.0, 110.0), "Annuler") {
                 selected_losange = None;
             }

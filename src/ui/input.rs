@@ -44,5 +44,3 @@ pub fn losange_hovered(board_x: f32, board_y: f32, cell_size: f32) {
         }
     }
 }
-
-pub fn place_egg(board_x: f32, board_y: f32, cell_size: f32) {}
