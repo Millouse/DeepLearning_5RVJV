@@ -163,6 +163,10 @@ impl Pond {
             self.board[idx] = Cell::Empty;
         }
     }
+
+    pub fn get_cell_index(&self, index: usize) -> Cell{
+        self.board[index]
+    }
 }
 
 impl Env for Pond {

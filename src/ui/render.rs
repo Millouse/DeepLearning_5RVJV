@@ -1,5 +1,6 @@
 use crate::ui::assets::Assets;
 use macroquad::prelude::*;
+use crate::environments::pond::{Cell, Pond};
 use std::process::id;
 
 pub struct BoardPosition {
@@ -52,7 +53,7 @@ pub fn draw_textured_rect(texture: &Texture2D, x: f32, y: f32, w: f32, h: f32) {
     );
 }
 
-pub fn draw_board(assets: &Assets) {
+pub fn draw_board(assets: &Assets, pond: &Pond) {
     draw_background(assets);
     draw_text("Pond UI", 20.0, 40.0, 40.0, WHITE);
 
@@ -99,12 +100,35 @@ pub fn draw_board(assets: &Assets) {
 
     for losange in losanges {
         draw_poly(losange.screen_x, losange.screen_y, 4, 25.0, 0.0, DARKBROWN);
-        draw_text(
-            &losange.id.to_string(),
-            losange.screen_x,
-            losange.screen_y,
-            30.0,
-            WHITE,
-        );
+        let index = losange.id as usize;
+        let cell_index = pond.get_cell_index(index);
+        draw_piece(assets, cell_index, losange.screen_x, losange.screen_y, cell_size, cell_size);
+    }
+}
+
+pub fn draw_piece(assets: &Assets, cell: Cell, x: f32, y:f32, w: f32, h:f32){
+    match cell {
+        Cell::Empty => {},
+        Cell::Egg(owner) => {
+            match owner {
+                0 => {draw_textured_rect(&assets.white_egg, x-50.0, y-50.0, w, h)}
+                1 => {draw_textured_rect(&assets.dark_egg, x-50.0, y-50.0, w, h)}
+                _ => {}
+            }
+        },
+        Cell::Tadpole(owner) => {
+            match owner {
+                0 => {draw_textured_rect(&assets.white_tadpole, x-50.0, y-50.0, w, h)}
+                1 => {draw_textured_rect(&assets.dark_tadpole, x-50.0, y-50.0, w, h)}
+                _ => {}
+            }
+        },
+        Cell::Frog(owner) => {
+            match owner {
+                0 => {draw_textured_rect(&assets.white_frog, x-50.0, y-50.0, w, h)}
+                1 => {draw_textured_rect(&assets.dark_frog, x-50.0, y-50.0, w, h)}
+                _ => {}
+            }
+        }
     }
 }

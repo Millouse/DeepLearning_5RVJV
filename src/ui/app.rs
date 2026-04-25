@@ -25,7 +25,7 @@ pub async fn run_ui() {
             println!("Selected losange clicked {}", id);
         }
 
-        draw_board(&assets);
+        draw_board(&assets, &pond);
 
         let losanges = board_positions(board_x, board_y, cell_size);
         for losange in &losanges {
