@@ -147,8 +147,8 @@ pub fn draw_hud(pond: &Pond){
     draw_text(&player_texte, screen_width()/2.0 - dims_player_texte.width / 2.0, 40.0, 40.0, WHITE);
 
     // Scores
-    let score_player1 = pond.score(0);
-    let score_player2 = pond.score(1);
+    let score_player1 = pond.get_player_score(0);
+    let score_player2 = pond.get_player_score(1);
 
     let score_player1_texte = format!("Score Joueur 1 : {}", score_player1);
     let dims_score1_texte = measure_text(&score_player1_texte, None, 40, 1.0);

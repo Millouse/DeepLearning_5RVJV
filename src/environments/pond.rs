@@ -167,6 +167,10 @@ impl Pond {
     pub fn get_cell_index(&self, index: usize) -> Cell{
         self.board[index]
     }
+
+    pub fn get_player_score(&self, player:usize) -> usize{
+        self.score[player]
+    }
 }
 
 impl Env for Pond {
