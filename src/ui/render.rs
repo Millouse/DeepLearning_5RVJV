@@ -2,6 +2,7 @@ use crate::ui::assets::Assets;
 use macroquad::prelude::*;
 use crate::environments::pond::{Cell, Pond};
 use std::process::id;
+use crate::traits::Env;
 
 pub struct BoardPosition {
     pub id: i32,
@@ -100,6 +101,8 @@ pub fn draw_board(assets: &Assets, pond: &Pond) {
 
     for losange in losanges {
         draw_poly(losange.screen_x, losange.screen_y, 4, 25.0, 0.0, DARKBROWN);
+
+        // Pièces
         let index = losange.id as usize;
         let cell_index = pond.get_cell_index(index);
         draw_piece(assets, cell_index, losange.screen_x, losange.screen_y, cell_size, cell_size);
@@ -135,6 +138,24 @@ pub fn draw_piece(assets: &Assets, cell: Cell, x: f32, y:f32, w: f32, h:f32){
 }
 
 // HUD
-//pub fn draw_hud() -> {
+pub fn draw_hud(pond: &Pond){
+    // Player
+    let player = (pond.current_player() + 1).to_string();
+    let player_texte = format!("Au tour du joueur {}", player);
+    let dims_player_texte = measure_text(&player_texte, None, 40, 1.0);
 
-//}
+    draw_text(&player_texte, screen_width()/2.0 - dims_player_texte.width / 2.0, 40.0, 40.0, WHITE);
+
+    // Scores
+    let score_player1 = pond.score(0);
+    let score_player2 = pond.score(1);
+
+    let score_player1_texte = format!("Score Joueur 1 : {}", score_player1);
+    let dims_score1_texte = measure_text(&score_player1_texte, None, 40, 1.0);
+
+    let score_player2_texte = format!("Score Joueur 2 : {}", score_player2);
+    let dims_score2_texte = measure_text(&score_player2_texte, None, 40, 1.0);
+
+    draw_text(&score_player1_texte, screen_width() - (dims_score1_texte.width + 30.0), 40.0, 40.0, WHITE);
+    draw_text(&score_player2_texte, screen_width() - (dims_score2_texte.width + 30.0), 100.0, 40.0, WHITE);
+}

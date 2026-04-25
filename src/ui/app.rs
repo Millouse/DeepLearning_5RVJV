@@ -1,6 +1,6 @@
 use crate::ui::assets::load_assets;
 use crate::ui::input::{losange_clicked, losange_hovered};
-use crate::ui::render::{board_positions, draw_board};
+use crate::ui::render::{board_positions, draw_board, draw_hud};
 use crate::traits::{Env, Action};
 use crate::environments::pond::Pond;
 use macroquad::miniquad::window::set_window_size;
@@ -26,6 +26,7 @@ pub async fn run_ui() {
         }
 
         draw_board(&assets, &pond);
+        draw_hud(&pond);
 
         let losanges = board_positions(board_x, board_y, cell_size);
         for losange in &losanges {
