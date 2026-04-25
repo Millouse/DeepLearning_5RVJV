@@ -106,29 +106,35 @@ pub fn draw_board(assets: &Assets, pond: &Pond) {
     }
 }
 
+// Pièces
 pub fn draw_piece(assets: &Assets, cell: Cell, x: f32, y:f32, w: f32, h:f32){
     match cell {
         Cell::Empty => {},
         Cell::Egg(owner) => {
             match owner {
-                0 => {draw_textured_rect(&assets.white_egg, x-50.0, y-50.0, w-10.0, h-10.0)}
-                1 => {draw_textured_rect(&assets.dark_egg, x-50.0, y-50.0, w-10.0, h-10.0)}
+                0 => {draw_textured_rect(&assets.white_egg, x-45.0, y-45.0, w-10.0, h-10.0)}
+                1 => {draw_textured_rect(&assets.dark_egg, x-45.0, y-45.0, w-10.0, h-10.0)}
                 _ => {}
             }
         },
         Cell::Tadpole(owner) => {
             match owner {
-                0 => {draw_textured_rect(&assets.white_tadpole, x-50.0, y-50.0, w-10.0, h-10.0)}
-                1 => {draw_textured_rect(&assets.dark_tadpole, x-50.0, y-50.0, w-10.0, h-10.0)}
+                0 => {draw_textured_rect(&assets.white_tadpole, x-45.0, y-45.0, w-10.0, h-10.0)}
+                1 => {draw_textured_rect(&assets.dark_tadpole, x-45.0, y-45.0, w-10.0, h-10.0)}
                 _ => {}
             }
         },
         Cell::Frog(owner) => {
             match owner {
-                0 => {draw_textured_rect(&assets.white_frog, x-50.0, y-50.0, w-10.0, h-10.0)}
-                1 => {draw_textured_rect(&assets.dark_frog, x-50.0, y-50.0, w-10.0, h-10.0)}
+                0 => {draw_textured_rect(&assets.white_frog, x-45.0, y-45.0, w-10.0, h-10.0)}
+                1 => {draw_textured_rect(&assets.dark_frog, x-45.0, y-45.0, w-10.0, h-10.0)}
                 _ => {}
             }
         }
     }
 }
+
+// HUD
+//pub fn draw_hud() -> {
+
+//}
