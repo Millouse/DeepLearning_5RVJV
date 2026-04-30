@@ -8,14 +8,27 @@ use macroquad::miniquad::window::set_window_size;
 use macroquad::prelude::*;
 use macroquad::ui::root_ui;
 
-/// Le joueur humain est toujours le joueur 0 ; l'IA random est le joueur 1.
-const HUMAN: usize = 0;
+#[derive(Clone, Copy, PartialEq)]
+enum AgentType {
+    Human,
+    Random,
+}
+
+enum GamePhase {
+    ChoosePlayer1,
+    ChoosePlayer2,
+    Playing,
+}
 
 pub async fn run_ui() {
     let assets = load_assets().await;
     let mut selected_losange: Option<i32> = None;
     let mut pond = Pond::new();
     let mut ai = RandomAgent;
+    let mut ai_delay: f32 = 0.0;
+    let ai_pause: f32 = 0.5;
+    let mut phase = GamePhase::ChoosePlayer1;
+    let mut agents: [AgentType; 2] = [AgentType::Human, AgentType::Random];
     set_window_size(1280, 720);
 
     loop {
@@ -23,28 +36,65 @@ pub async fn run_ui() {
         let board_y = screen_height() / 2.0 - 250.0;
         let cell_size = 100.0;
 
-        //Tour de l'IA random (joueur 1)
-        if !pond.is_game_over() && pond.current_player() != HUMAN {
-            let obs = pond.to_observation();
-            let legal = pond.legal_action();
-            if !legal.is_empty() {
-                let action = ai.select_action(&obs, legal, Some(&pond as &dyn Env));
-                pond.step(action);
+        match phase {
+            GamePhase::ChoosePlayer1 => {
+                clear_background(BLACK);
+                draw_text("Joueur 1 :", screen_width() / 2.0 - 80.0, 200.0, 36.0, WHITE);
+                if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 240.0), "Humain") {
+                    agents[0] = AgentType::Human;
+                    phase = GamePhase::ChoosePlayer2;
+                }
+                if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 280.0), "Random") {
+                    agents[0] = AgentType::Random;
+                    phase = GamePhase::ChoosePlayer2;
+                }
+                next_frame().await;
+                continue;
             }
+            GamePhase::ChoosePlayer2 => {
+                clear_background(BLACK);
+                draw_text("Joueur 2 :", screen_width() / 2.0 - 80.0, 200.0, 36.0, WHITE);
+                if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 240.0), "Humain") {
+                    agents[1] = AgentType::Human;
+                    phase = GamePhase::Playing;
+                }
+                if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 280.0), "Random") {
+                    agents[1] = AgentType::Random;
+                    phase = GamePhase::Playing;
+                }
+                next_frame().await;
+                continue;
+            }
+            GamePhase::Playing => {}
         }
 
-        //Clic du joueur humain
-        if !pond.is_game_over() && pond.current_player() == HUMAN {
+        let current = pond.current_player();
+        let current_agent = agents[current];
+
+        if !pond.is_game_over() && current_agent == AgentType::Random {
+            ai_delay += get_frame_time();
+            if ai_delay >= ai_pause {
+                let obs = pond.to_observation();
+                let legal = pond.legal_action();
+                if !legal.is_empty() {
+                    let action = ai.select_action(&obs, legal, Some(&pond as &dyn Env));
+                    pond.step(action);
+                }
+                ai_delay = 0.0;
+            }
+        } else {
+            ai_delay = 0.0;
+        }
+
+        if !pond.is_game_over() && current_agent == AgentType::Human {
             if let Some(id) = losange_clicked(board_x, board_y, cell_size) {
-                handle_human_click(&mut pond, &mut selected_losange, id);
+                handle_human_click(&mut pond, &mut selected_losange, id, current);
             }
         }
 
-        //Affichage
         draw_board(&assets, &pond);
         draw_hud(&pond);
 
-        // Surbrillance de la case sélectionnée
         let losanges = board_positions(board_x, board_y, cell_size);
         for losange in &losanges {
             if selected_losange == Some(losange.id) {
@@ -58,23 +108,23 @@ pub async fn run_ui() {
             }
         }
 
-        // Hover quand rien n'est sélectionné et que c'est notre tour
-        if selected_losange.is_none() && !pond.is_game_over() && pond.current_player() == HUMAN {
+        if selected_losange.is_none()
+            && !pond.is_game_over()
+            && current_agent == AgentType::Human
+        {
             losange_hovered(board_x, board_y, cell_size);
         }
 
-        // Bouton Annuler
         if selected_losange.is_some() {
             if root_ui().button(vec2(30.0, 110.0), "Annuler") {
                 selected_losange = None;
             }
         }
 
-        // Fin de partie
         if pond.is_game_over() {
             let winner_text = match (pond.get_player_score(0), pond.get_player_score(1)) {
-                (a, b) if a > b => "Le joueur 1 (humain) gagne !",
-                (a, b) if b > a => "Le joueur 2 (IA) gagne !",
+                (a, b) if a > b => "Le joueur 1 gagne !",
+                (a, b) if b > a => "Le joueur 2 gagne !",
                 _ => "Egalite",
             };
             draw_text(winner_text, 30.0, 160.0, 36.0, YELLOW);
@@ -82,6 +132,7 @@ pub async fn run_ui() {
             if root_ui().button(vec2(30.0, 200.0), "Rejouer") {
                 pond.reset();
                 selected_losange = None;
+                phase = GamePhase::ChoosePlayer1;
             }
         }
 
@@ -89,12 +140,7 @@ pub async fn run_ui() {
     }
 }
 
-
-/// Règle : aucune sélection -> case vide = pose œuf, case avec ma pièce = sélection.
-///         pièce sélectionnée -> clic case vide = tentative de déplacement,
-///                               clic même pièce = annulation.
-/// On valide toujours l'action contre `pond.legal_action()`.
-fn handle_human_click(pond: &mut Pond, selected: &mut Option<i32>, clicked_id: i32) {
+fn handle_human_click(pond: &mut Pond, selected: &mut Option<i32>, clicked_id: i32, player: usize) {
     let legal = pond.legal_action();
     let idx = clicked_id as usize;
 
@@ -103,24 +149,19 @@ fn handle_human_click(pond: &mut Pond, selected: &mut Option<i32>, clicked_id: i
             let cell = pond.get_cell_index(idx);
             match cell {
                 Cell::Empty => {
-                    // Pose oeuf
                     let action: Action = idx;
                     if legal.contains(&action) {
                         pond.step(action);
                     }
                 }
-                Cell::Tadpole(o) | Cell::Frog(o) if o == HUMAN => {
-                    // Selection d'une de mes pieces
+                Cell::Tadpole(o) | Cell::Frog(o) if o == player => {
                     *selected = Some(clicked_id);
                 }
-                _ => {
-                    // Piece adverse ou autre : on ignore
-                }
+                _ => {}
             }
         }
         Some(src_id) => {
             if src_id == clicked_id {
-                // Re-clic sur la meme case = annulation
                 *selected = None;
                 return;
             }
@@ -128,8 +169,8 @@ fn handle_human_click(pond: &mut Pond, selected: &mut Option<i32>, clicked_id: i
             let dst = idx;
             let src_cell = pond.get_cell_index(src);
             let action: Option<Action> = match src_cell {
-                Cell::Tadpole(o) if o == HUMAN => Some(16 + src * 16 + dst),
-                Cell::Frog(o)    if o == HUMAN => Some(16 + 256 + src * 16 + dst),
+                Cell::Tadpole(o) if o == player => Some(16 + src * 16 + dst),
+                Cell::Frog(o)    if o == player => Some(16 + 256 + src * 16 + dst),
                 _ => None,
             };
 
@@ -137,8 +178,6 @@ fn handle_human_click(pond: &mut Pond, selected: &mut Option<i32>, clicked_id: i
                 if legal.contains(&a) {
                     pond.step(a);
                     *selected = None;
-                } else {
-                    // Coup illegal : on garde la selection pour reessayer ailleurs
                 }
             } else {
                 *selected = None;
