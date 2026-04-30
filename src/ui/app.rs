@@ -4,6 +4,8 @@ use crate::ui::render::{board_positions, draw_board, draw_hud};
 use crate::traits::{Env, Action, Agent};
 use crate::environments::pond::{Cell, Pond};
 use crate::agents::random::RandomAgent;
+use crate::agents::random_rollout::RandomRolloutAgent;
+use crate::agents::mcts::MCTS;
 use macroquad::miniquad::window::set_window_size;
 use macroquad::prelude::*;
 use macroquad::ui::root_ui;
@@ -12,6 +14,8 @@ use macroquad::ui::root_ui;
 enum AgentType {
     Human,
     Random,
+    Rollout,
+    Mcts,
 }
 
 enum GamePhase {
@@ -24,7 +28,9 @@ pub async fn run_ui() {
     let assets = load_assets().await;
     let mut selected_losange: Option<i32> = None;
     let mut pond = Pond::new();
-    let mut ai = RandomAgent;
+    let mut ai_random = RandomAgent;
+    let mut ai_rollout = RandomRolloutAgent::new(100);
+    let mut ai_mcts = MCTS::new(1000, 1.41);
     let mut ai_delay: f32 = 0.0;
     let ai_pause: f32 = 0.5;
     let mut phase = GamePhase::ChoosePlayer1;
@@ -48,6 +54,14 @@ pub async fn run_ui() {
                     agents[0] = AgentType::Random;
                     phase = GamePhase::ChoosePlayer2;
                 }
+                if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 320.0), "Rollout") {
+                    agents[0] = AgentType::Rollout;
+                    phase = GamePhase::ChoosePlayer2;
+                }
+                if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 360.0), "MCTS") {
+                    agents[0] = AgentType::Mcts;
+                    phase = GamePhase::ChoosePlayer2;
+                }
                 next_frame().await;
                 continue;
             }
@@ -62,6 +76,14 @@ pub async fn run_ui() {
                     agents[1] = AgentType::Random;
                     phase = GamePhase::Playing;
                 }
+                if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 320.0), "Rollout") {
+                    agents[1] = AgentType::Rollout;
+                    phase = GamePhase::Playing;
+                }
+                if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 360.0), "MCTS") {
+                    agents[1] = AgentType::Mcts;
+                    phase = GamePhase::Playing;
+                }
                 next_frame().await;
                 continue;
             }
@@ -71,13 +93,18 @@ pub async fn run_ui() {
         let current = pond.current_player();
         let current_agent = agents[current];
 
-        if !pond.is_game_over() && current_agent == AgentType::Random {
+        if !pond.is_game_over() && current_agent != AgentType::Human {
             ai_delay += get_frame_time();
             if ai_delay >= ai_pause {
                 let obs = pond.to_observation();
                 let legal = pond.legal_action();
                 if !legal.is_empty() {
-                    let action = ai.select_action(&obs, legal, Some(&pond as &dyn Env));
+                    let action = match current_agent {
+                        AgentType::Random => ai_random.select_action(&obs, legal, Some(&pond as &dyn Env)),
+                        AgentType::Rollout => ai_rollout.select_action(&obs, legal, Some(&pond as &dyn Env)),
+                        AgentType::Mcts => ai_mcts.select_action(&obs, legal, Some(&pond as &dyn Env)),
+                        _ => unreachable!(),
+                    };
                     pond.step(action);
                 }
                 ai_delay = 0.0;
