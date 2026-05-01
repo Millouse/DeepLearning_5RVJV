@@ -177,7 +177,9 @@ pub async fn run_ui() {
         }
 
         if selected_losange.is_some() {
-            if root_ui().button(vec2(30.0, 110.0), "Annuler") {
+            let dims_annuler_texte = measure_text("Annuler", Some(&assets.font), 36, 1.0);
+
+            if custom_button(&assets, "Annuler", screen_width() / 2.0 - dims_annuler_texte.width / 2.0, 650.0, button_w, button_h) {
                 selected_losange = None;
             }
         }
