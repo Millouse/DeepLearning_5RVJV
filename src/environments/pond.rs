@@ -1,3 +1,4 @@
+use crate::environments::pond::Cell::Egg;
 use crate::traits::{Action, Env, Observation, Reward};
 
 #[derive(Copy, Clone, PartialEq)]
@@ -58,6 +59,9 @@ pub struct Pond {
 
     /// Is the game finished
     game_over: bool,
+
+    /// Collected Pieces
+    collected_pieces: [Vec<Cell>;2],
 }
 
 impl Pond {
@@ -69,6 +73,7 @@ impl Pond {
             egg_in_spawn: [13, 13],
             score: [0, 0],
             game_over: false,
+            collected_pieces: [Vec::new(), Vec::new()],
         }
     }
 
@@ -157,8 +162,10 @@ impl Pond {
             }
         }
         for idx in to_score {
-            if let Some(owner) = self.board[idx].owner() {
+            let collected_piece = self.board[idx];
+            if let Some(owner) = collected_piece.owner() {
                 self.score[owner] += 1;
+                self.collected_pieces[owner].push(collected_piece);
             }
             self.board[idx] = Cell::Empty;
         }
@@ -171,6 +178,10 @@ impl Pond {
     pub fn get_player_score(&self, player:usize) -> usize{
         self.score[player]
     }
+
+    pub fn get_collected_pieces(&self, player: usize) -> &[Cell] {
+        &self.collected_pieces[player]
+    }
 }
 
 impl Env for Pond {
@@ -181,6 +192,7 @@ impl Env for Pond {
         self.score = [0, 0];
         self.game_over = false;
         self.board = vec![Cell::Empty; 16];
+        self.collected_pieces = [Vec::new(), Vec::new()];
         self.to_observation()
     }
 

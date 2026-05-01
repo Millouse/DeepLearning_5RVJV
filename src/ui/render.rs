@@ -105,32 +105,33 @@ pub fn draw_board(assets: &Assets, pond: &Pond) {
         // Pièces
         let index = losange.id as usize;
         let cell_index = pond.get_cell_index(index);
-        draw_piece(assets, cell_index, losange.screen_x, losange.screen_y, cell_size, cell_size);
+        draw_piece(assets, cell_index, losange.screen_x, losange.screen_y, cell_size);
     }
 }
 
 // Pièces
-pub fn draw_piece(assets: &Assets, cell: Cell, x: f32, y:f32, w: f32, h:f32){
+pub fn draw_piece(assets: &Assets, cell: Cell, x: f32, y:f32, size: f32){
+
     match cell {
         Cell::Empty => {},
         Cell::Egg(owner) => {
             match owner {
-                0 => {draw_textured_rect(&assets.white_egg, x-45.0, y-45.0, w-10.0, h-10.0)}
-                1 => {draw_textured_rect(&assets.dark_egg, x-45.0, y-45.0, w-10.0, h-10.0)}
+                0 => {draw_textured_rect(&assets.white_egg, x-45.0, y-45.0, size-10.0, size-10.0)}
+                1 => {draw_textured_rect(&assets.dark_egg, x-45.0, y-45.0, size-10.0, size-10.0)}
                 _ => {}
             }
         },
         Cell::Tadpole(owner) => {
             match owner {
-                0 => {draw_textured_rect(&assets.white_tadpole, x-45.0, y-45.0, w-10.0, h-10.0)}
-                1 => {draw_textured_rect(&assets.dark_tadpole, x-45.0, y-45.0, w-10.0, h-10.0)}
+                0 => {draw_textured_rect(&assets.white_tadpole, x-45.0, y-45.0, size-10.0, size-10.0)}
+                1 => {draw_textured_rect(&assets.dark_tadpole, x-45.0, y-45.0, size-10.0, size-10.0)}
                 _ => {}
             }
         },
         Cell::Frog(owner) => {
             match owner {
-                0 => {draw_textured_rect(&assets.white_frog, x-45.0, y-45.0, w-10.0, h-10.0)}
-                1 => {draw_textured_rect(&assets.dark_frog, x-45.0, y-45.0, w-10.0, h-10.0)}
+                0 => {draw_textured_rect(&assets.white_frog, x-45.0, y-45.0, size-10.0, size-10.0)}
+                1 => {draw_textured_rect(&assets.dark_frog, x-45.0, y-45.0, size-10.0, size-10.0)}
                 _ => {}
             }
         }
@@ -138,7 +139,7 @@ pub fn draw_piece(assets: &Assets, cell: Cell, x: f32, y:f32, w: f32, h:f32){
 }
 
 // HUD
-pub fn draw_hud(pond: &Pond){
+pub fn draw_hud(assets: &Assets,pond: &Pond){
     // Player
     let player = (pond.current_player() + 1).to_string();
     let player_texte = format!("Au tour du joueur {}", player);
@@ -158,4 +159,15 @@ pub fn draw_hud(pond: &Pond){
 
     draw_text(&score_player1_texte, screen_width() - (dims_score1_texte.width + 30.0), 40.0, 40.0, WHITE);
     draw_text(&score_player2_texte, screen_width() - (dims_score2_texte.width + 30.0), 100.0, 40.0, WHITE);
+
+    // Pièces collectées
+    let cell_size: f32 = 100.0;
+    let collected_player1 = pond.get_collected_pieces(0);
+    let collected_player2 = pond.get_collected_pieces(1);
+    let screen_x_joueur1 = 80.0;
+    let screen_y_joueur1 = 200.0;
+
+    for piece in collected_player1{
+        draw_piece(assets, *piece, screen_x_joueur1, screen_y_joueur1, cell_size);
+    }
 }

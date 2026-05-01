@@ -120,7 +120,7 @@ pub async fn run_ui() {
         }
 
         draw_board(&assets, &pond);
-        draw_hud(&pond);
+        draw_hud(&assets, &pond);
 
         let losanges = board_positions(board_x, board_y, cell_size);
         for losange in &losanges {

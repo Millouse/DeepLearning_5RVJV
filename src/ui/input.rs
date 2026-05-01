@@ -13,9 +13,9 @@ pub fn losange_clicked(board_x: f32, board_y: f32, cell_size: f32) -> Option<i32
         for losange in losanges {
             let delta_x = mouse_x - losange.screen_x;
             let delta_y = mouse_y - losange.screen_y;
-            let distance = (delta_x * delta_x + delta_y * delta_y).sqrt();
+            let distance = delta_x * delta_x + delta_y * delta_y;
 
-            if distance <= 50.0 {
+            if distance <= 2500.0 {
                 return Some(losange.id);
             }
         }
@@ -31,9 +31,9 @@ pub fn losange_hovered(board_x: f32, board_y: f32, cell_size: f32) {
     for losange in losanges {
         let delta_x = mouse_x - losange.screen_x;
         let delta_y = mouse_y - losange.screen_y;
-        let distance = (delta_x * delta_x + delta_y * delta_y).sqrt();
+        let distance = delta_x * delta_x + delta_y * delta_y;
 
-        if distance <= 50.0 {
+        if distance <= 2500.0 {
             draw_rectangle(
                 losange.screen_x - 40.0,
                 losange.screen_y - 40.0,
