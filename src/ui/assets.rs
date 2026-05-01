@@ -10,6 +10,7 @@ pub struct Assets {
     pub dark_egg: Texture2D,
     pub dark_tadpole: Texture2D,
     pub dark_frog: Texture2D,
+    pub font: Font,
 }
 
 pub async fn load_assets() -> Assets {
@@ -24,6 +25,7 @@ pub async fn load_assets() -> Assets {
     let dark_egg = load_texture("ressources/dark_egg.png").await.unwrap();
     let dark_tadpole = load_texture("ressources/dark_tadpole.png").await.unwrap();
     let dark_frog = load_texture("ressources/dark_frog.png").await.unwrap();
+    let font = load_ttf_font("ressources/fonts/super_mindset.ttf").await.unwrap();
 
     Assets {
         background,
@@ -35,5 +37,6 @@ pub async fn load_assets() -> Assets {
         dark_egg,
         dark_tadpole,
         dark_frog,
+        font,
     }
 }

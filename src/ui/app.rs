@@ -45,7 +45,13 @@ pub async fn run_ui() {
         match phase {
             GamePhase::ChoosePlayer1 => {
                 clear_background(BLACK);
-                draw_text("Joueur 1 :", screen_width() / 2.0 - 80.0, 200.0, 36.0, WHITE);
+                draw_text_ex("Joueur 1 :", screen_width() / 2.0 - 80.0, 200.0, TextParams {
+                    font: Some(&assets.font),
+                    font_size: 36,
+                    color: WHITE,
+                    ..Default::default()
+                },);
+
                 if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 240.0), "Humain") {
                     agents[0] = AgentType::Human;
                     phase = GamePhase::ChoosePlayer2;
@@ -67,7 +73,12 @@ pub async fn run_ui() {
             }
             GamePhase::ChoosePlayer2 => {
                 clear_background(BLACK);
-                draw_text("Joueur 2 :", screen_width() / 2.0 - 80.0, 200.0, 36.0, WHITE);
+                draw_text_ex("Joueur 2 :", screen_width() / 2.0 - 80.0, 200.0, TextParams {
+                    font: Some(&assets.font),
+                    font_size: 36,
+                    color: WHITE,
+                    ..Default::default()
+                },);
                 if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 240.0), "Humain") {
                     agents[1] = AgentType::Human;
                     phase = GamePhase::Playing;
@@ -152,11 +163,52 @@ pub async fn run_ui() {
             let winner_text = match (pond.get_player_score(0), pond.get_player_score(1)) {
                 (a, b) if a > b => "Le joueur 1 gagne !",
                 (a, b) if b > a => "Le joueur 2 gagne !",
-                _ => "Egalite",
+                _ => "Egalité !",
             };
-            draw_text(winner_text, 30.0, 160.0, 36.0, YELLOW);
 
-            if root_ui().button(vec2(30.0, 200.0), "Rejouer") {
+            // Transparent
+            draw_rectangle(
+                0.0,
+                0.0,
+                screen_width(),
+                screen_height(),
+                Color::new(0.0, 0.0, 0.0, 0.45),
+            );
+
+            // Fond
+            let panel_w = 400.0;
+            let panel_h = 200.0;
+            let panel_x = screen_width() / 2.0 - panel_w / 2.0;
+            let panel_y = screen_height() / 2.0 - panel_h / 2.0;
+
+            draw_rectangle(
+                panel_x,
+                panel_y,
+                panel_w,
+                panel_h,
+                BLACK,
+            );
+
+            // Texte gagnant
+            let dims_winner_texte = measure_text(winner_text, Some(&assets.font), 36, 1.0);
+
+            draw_text_ex(
+                winner_text,
+                screen_width() / 2.0 - dims_winner_texte.width / 2.0,
+                panel_y + 80.0, TextParams {
+                    font: Some(&assets.font),
+                    font_size: 36,
+                    color: YELLOW,
+                    ..Default::default()
+                },
+            );
+
+            // Rejouer
+            let button_w = 120.0;
+            let button_x = screen_width() / 2.0 - button_w / 2.0;
+            let button_y = panel_y + 150.0;
+
+            if root_ui().button(vec2(button_x, button_y), "Rejouer") {
                 pond.reset();
                 selected_losange = None;
                 phase = GamePhase::ChoosePlayer1;

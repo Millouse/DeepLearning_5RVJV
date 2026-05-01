@@ -56,7 +56,12 @@ pub fn draw_textured_rect(texture: &Texture2D, x: f32, y: f32, w: f32, h: f32) {
 
 pub fn draw_board(assets: &Assets, pond: &Pond) {
     draw_background(assets);
-    draw_text("Pond UI", 20.0, 40.0, 40.0, WHITE);
+    draw_text_ex("Pond", 20.0, 40.0, TextParams {
+        font: Some(&assets.font),
+        font_size: 40,
+        color: YELLOW,
+        ..Default::default()
+    },);
 
     let cell_size: f32 = 100.0;
     let board_x = screen_width() / 2.0 - 250.0;
@@ -140,12 +145,38 @@ pub fn draw_piece(assets: &Assets, cell: Cell, x: f32, y:f32, size: f32){
 
 // HUD
 pub fn draw_hud(assets: &Assets,pond: &Pond){
-    // Player
+    let padding_x = 20.0;
+    let padding_y = 12.0;
+
+    // Tour player
     let player = (pond.current_player() + 1).to_string();
     let player_texte = format!("Au tour du joueur {}", player);
-    let dims_player_texte = measure_text(&player_texte, None, 40, 1.0);
+    let dims_player_texte = measure_text(&player_texte, Some(&assets.font), 40, 1.0);
 
-    draw_text(&player_texte, screen_width()/2.0 - dims_player_texte.width / 2.0, 40.0, 40.0, WHITE);
+    let text_y_player = 60.0;
+    let text_x_player = screen_width() / 2.0 - dims_player_texte.width / 2.0;
+
+    let panel_w_player = dims_player_texte.width + padding_x * 2.0;
+    let panel_h_player = dims_player_texte.height + padding_y * 2.0;
+    let panel_x_player = screen_width() / 2.0 - panel_w_player / 2.0;
+    let panel_y_player = text_y_player - 40.0;
+
+    // Fond player
+    draw_rectangle(
+        panel_x_player,
+        panel_y_player,
+        panel_w_player,
+        panel_h_player,
+        BLACK,
+    );
+
+    // Texte player
+    draw_text_ex(&player_texte, text_x_player , text_y_player, TextParams {
+        font: Some(&assets.font),
+        font_size: 40,
+        color: WHITE,
+        ..Default::default()
+    },);
 
     // Scores
     let score_player1 = pond.get_player_score(0);
@@ -153,10 +184,60 @@ pub fn draw_hud(assets: &Assets,pond: &Pond){
 
     let score_player1_texte = format!("Score Joueur 1 : {}", score_player1);
     let score_player2_texte = format!("Score Joueur 2 : {}", score_player2);
-    let dims_score2_texte = measure_text(&score_player2_texte, None, 40, 1.0);
 
-    draw_text(&score_player1_texte, 30.0, 150.0, 40.0, WHITE);
-    draw_text(&score_player2_texte, screen_width() - (dims_score2_texte.width + 30.0), 150.0, 40.0, WHITE);
+    let dims_score1_texte = measure_text(&score_player1_texte, Some(&assets.font), 40, 1.0);
+    let dims_score2_texte = measure_text(&score_player2_texte, Some(&assets.font), 40, 1.0);
+
+    let text_y_score = 150.0;
+
+    // Joueur 1 gauche
+    let text_x_score1 = 40.0;
+
+    let panel_w_score1 = dims_score1_texte.width + padding_x * 2.0;
+    let panel_h_score1 = dims_score1_texte.height + padding_y * 2.0;
+    let panel_x_score1 = text_x_score1 - padding_x;
+    let panel_y_score = text_y_score - dims_score1_texte.height - padding_y;
+
+    // Fond score 1
+    draw_rectangle(
+        panel_x_score1,
+        panel_y_score,
+        panel_w_score1,
+        panel_h_score1,
+        BLACK,
+    );
+
+    // Texte score 1
+    draw_text_ex(&score_player1_texte, text_x_score1 , text_y_score, TextParams {
+        font: Some(&assets.font),
+        font_size: 40,
+        color: WHITE,
+        ..Default::default()
+    },);
+
+    // Joueur 2 droite
+    let text_x_score2 = screen_width() - (dims_score2_texte.width + 40.0);
+
+    let panel_w_score2 = dims_score2_texte.width + padding_x * 2.0;
+    let panel_h_score2 = dims_score2_texte.height + padding_y * 2.0;
+    let panel_x_score2 = text_x_score2 - padding_x;
+
+    // Fond score 2
+    draw_rectangle(
+        panel_x_score2,
+        panel_y_score,
+        panel_w_score2,
+        panel_h_score2,
+        BLACK,
+    );
+
+    // Texte score 2
+    draw_text_ex(&score_player2_texte, text_x_score2, text_y_score, TextParams {
+        font: Some(&assets.font),
+        font_size: 40,
+        color: WHITE,
+        ..Default::default()
+    },);
 
     // Pièces collectées
     let cell_size: f32 = 60.0;
