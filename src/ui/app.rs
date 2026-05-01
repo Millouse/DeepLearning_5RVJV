@@ -1,6 +1,6 @@
 use crate::ui::assets::load_assets;
 use crate::ui::input::{losange_clicked, losange_hovered};
-use crate::ui::render::{board_positions, draw_board, draw_hud};
+use crate::ui::render::{board_positions, draw_board, draw_hud, custom_button, draw_background};
 use crate::traits::{Env, Action, Agent};
 use crate::environments::pond::{Cell, Pond};
 use crate::agents::random::RandomAgent;
@@ -41,30 +41,43 @@ pub async fn run_ui() {
         let board_x = screen_width() / 2.0 - 250.0;
         let board_y = screen_height() / 2.0 - 250.0;
         let cell_size = 100.0;
+        let button_w = 120.0;
+        let button_h = 40.0;
+        let dims_pond = measure_text("POND", Some(&assets.font), 150, 1.0);
 
         match phase {
             GamePhase::ChoosePlayer1 => {
-                clear_background(BLACK);
-                draw_text_ex("Joueur 1 :", screen_width() / 2.0 - 80.0, 200.0, TextParams {
+                draw_background(&assets);
+
+                let dims_joueur1 = measure_text("Joueur 1 :", Some(&assets.font), 36, 1.0);
+
+                draw_text_ex("POND", screen_width() / 2.0 - dims_pond.width / 2.0, 150.0, TextParams {
+                    font: Some(&assets.font),
+                    font_size: 150,
+                    color: YELLOW,
+                    ..Default::default()
+                },);
+
+                draw_text_ex("Joueur 1 :", screen_width() / 2.0 - dims_joueur1.width / 2.0, 200.0, TextParams {
                     font: Some(&assets.font),
                     font_size: 36,
                     color: WHITE,
                     ..Default::default()
                 },);
 
-                if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 240.0), "Humain") {
+                if custom_button(&assets, "Humain", screen_width() / 2.0 - button_w / 2.0, 240.0, button_w, button_h) {
                     agents[0] = AgentType::Human;
                     phase = GamePhase::ChoosePlayer2;
                 }
-                if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 280.0), "Random") {
+                if custom_button(&assets, "Random", screen_width() / 2.0 - button_w / 2.0, 300.0, button_w, button_h) {
                     agents[0] = AgentType::Random;
                     phase = GamePhase::ChoosePlayer2;
                 }
-                if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 320.0), "Rollout") {
+                if custom_button(&assets, "Rollout", screen_width() / 2.0 - button_w / 2.0, 360.0, button_w, button_h) {
                     agents[0] = AgentType::Rollout;
                     phase = GamePhase::ChoosePlayer2;
                 }
-                if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 360.0), "MCTS") {
+                if custom_button(&assets, "MCTS", screen_width() / 2.0 - button_w / 2.0, 420.0, button_w, button_h) {
                     agents[0] = AgentType::Mcts;
                     phase = GamePhase::ChoosePlayer2;
                 }
@@ -72,26 +85,36 @@ pub async fn run_ui() {
                 continue;
             }
             GamePhase::ChoosePlayer2 => {
-                clear_background(BLACK);
-                draw_text_ex("Joueur 2 :", screen_width() / 2.0 - 80.0, 200.0, TextParams {
+                draw_background(&assets);
+
+                let dims_joueur2 = measure_text("Joueur 2 :", Some(&assets.font), 36, 1.0);
+
+                draw_text_ex("POND", screen_width() / 2.0 - dims_pond.width / 2.0, 150.0, TextParams {
+                    font: Some(&assets.font),
+                    font_size: 150,
+                    color: YELLOW,
+                    ..Default::default()
+                },);
+
+                draw_text_ex("Joueur 2 :", screen_width() / 2.0 - dims_joueur2.width / 2.0, 200.0, TextParams {
                     font: Some(&assets.font),
                     font_size: 36,
                     color: WHITE,
                     ..Default::default()
                 },);
-                if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 240.0), "Humain") {
+                if custom_button(&assets, "Humain", screen_width() / 2.0 - button_w / 2.0, 240.0, button_w, button_h) {
                     agents[1] = AgentType::Human;
                     phase = GamePhase::Playing;
                 }
-                if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 280.0), "Random") {
+                if custom_button(&assets, "Random", screen_width() / 2.0 - button_w / 2.0, 300.0, button_w, button_h) {
                     agents[1] = AgentType::Random;
                     phase = GamePhase::Playing;
                 }
-                if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 320.0), "Rollout") {
+                if custom_button(&assets, "Rollout", screen_width() / 2.0 - button_w / 2.0, 360.0, button_w, button_h) {
                     agents[1] = AgentType::Rollout;
                     phase = GamePhase::Playing;
                 }
-                if root_ui().button(vec2(screen_width() / 2.0 - 80.0, 360.0), "MCTS") {
+                if custom_button(&assets, "MCTS", screen_width() / 2.0 - button_w / 2.0, 420.0, button_w, button_h) {
                     agents[1] = AgentType::Mcts;
                     phase = GamePhase::Playing;
                 }
@@ -176,8 +199,8 @@ pub async fn run_ui() {
             );
 
             // Fond
-            let panel_w = 400.0;
-            let panel_h = 200.0;
+            let panel_w = 350.0;
+            let panel_h = 150.0;
             let panel_x = screen_width() / 2.0 - panel_w / 2.0;
             let panel_y = screen_height() / 2.0 - panel_h / 2.0;
 
@@ -195,7 +218,7 @@ pub async fn run_ui() {
             draw_text_ex(
                 winner_text,
                 screen_width() / 2.0 - dims_winner_texte.width / 2.0,
-                panel_y + 80.0, TextParams {
+                panel_y + 50.0, TextParams {
                     font: Some(&assets.font),
                     font_size: 36,
                     color: YELLOW,
@@ -205,10 +228,11 @@ pub async fn run_ui() {
 
             // Rejouer
             let button_w = 120.0;
+            let button_h = 40.0;
             let button_x = screen_width() / 2.0 - button_w / 2.0;
-            let button_y = panel_y + 150.0;
+            let button_y = panel_y + 80.0;
 
-            if root_ui().button(vec2(button_x, button_y), "Rejouer") {
+            if custom_button(&assets, "Rejouer", button_x, button_y, button_w, button_h) {
                 pond.reset();
                 selected_losange = None;
                 phase = GamePhase::ChoosePlayer1;

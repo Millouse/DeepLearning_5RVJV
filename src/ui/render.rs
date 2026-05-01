@@ -2,6 +2,7 @@ use crate::ui::assets::Assets;
 use macroquad::prelude::*;
 use crate::environments::pond::{Cell, Pond};
 use std::process::id;
+use macroquad::input::MouseButton::Left;
 use crate::traits::Env;
 
 pub struct BoardPosition {
@@ -176,7 +177,7 @@ pub fn draw_hud(assets: &Assets,pond: &Pond){
         font_size: 40,
         color: WHITE,
         ..Default::default()
-    },);
+    });
 
     // Scores
     let score_player1 = pond.get_player_score(0);
@@ -213,7 +214,7 @@ pub fn draw_hud(assets: &Assets,pond: &Pond){
         font_size: 40,
         color: WHITE,
         ..Default::default()
-    },);
+    });
 
     // Joueur 2 droite
     let text_x_score2 = screen_width() - (dims_score2_texte.width + 40.0);
@@ -237,7 +238,7 @@ pub fn draw_hud(assets: &Assets,pond: &Pond){
         font_size: 40,
         color: WHITE,
         ..Default::default()
-    },);
+    });
 
     // Pièces collectées
     let cell_size: f32 = 60.0;
@@ -269,4 +270,36 @@ pub fn draw_hud(assets: &Assets,pond: &Pond){
 
         draw_piece(assets, *piece, x, y, cell_size);
     }
+}
+
+pub fn custom_button(assets: &Assets, text: &str, x: f32, y: f32, w: f32, h: f32) -> bool{
+    let (mouse_x, mouse_y) = mouse_position();
+
+    // Hover
+    let hovered = mouse_x >= x && mouse_x <= x+w && mouse_y >= y && mouse_y <= y+h;
+    let color = if hovered{
+        Color::new(0.8,0.8,0.8,1.0)
+    }
+    else{
+        Color::new(1.0,1.0,1.0,1.0)
+    };
+
+    // Fond
+    draw_rectangle(x,y,w,h,color);
+
+    // Texte
+    let font_size = 24;
+    let dims_button = measure_text(text, Some(&assets.font), font_size, 1.0);
+
+    let text_x = x + w / 2.0 - dims_button.width / 2.0;
+    let text_y = y + h / 2.0 + dims_button.height / 2.0;
+
+    draw_text_ex(text, text_x, text_y, TextParams {
+        font: Some(&assets.font),
+        font_size,
+        color: BLACK,
+        ..Default::default()
+    });
+
+    hovered && is_mouse_button_pressed(Left)
 }
