@@ -51,6 +51,8 @@ impl Runner {
         let mut steps = Vec::with_capacity(n);
         let mut times = Vec::with_capacity(n);
 
+        let start = Instant::now();
+
         for i in 0..n {
             print!("\r  Episode {}/{}", i, n);
             io::stdout().flush().unwrap();
@@ -65,12 +67,15 @@ impl Runner {
         print!("\r");
         io::stdout().flush().unwrap();
 
+        let elapsed = start.elapsed().as_secs_f64();
+
         RunStats {
             mean_score: mean(&scores),
             mean_score_player_2: mean(&scores_player_2),
             mean_steps: mean_usize(&steps),
             mean_move_time_ms: mean_f64(&times),
             n_episodes: n,
+            games_per_sec: n as f64 / elapsed,
         }
     }
 
@@ -128,6 +133,8 @@ impl Runner {
         let mut steps = Vec::with_capacity(n);
         let mut times = Vec::with_capacity(n);
 
+        let start = Instant::now();
+
         for i in 0..n {
             print!("\r Training... Episode {}/{}", i, n);
             io::stdout().flush().unwrap();
@@ -142,12 +149,15 @@ impl Runner {
         print!("\r");
         io::stdout().flush().unwrap();
 
+        let elapsed = start.elapsed().as_secs_f64();
+
         RunStats {
             mean_score: mean(&scores),
             mean_score_player_2: mean(&scores_player_2),
             mean_steps: mean_usize(&steps),
             mean_move_time_ms: mean_f64(&times),
             n_episodes: n,
+            games_per_sec: n as f64 / elapsed,
         }
     }
 }

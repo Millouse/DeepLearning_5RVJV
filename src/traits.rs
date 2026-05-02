@@ -80,4 +80,5 @@ pub struct RunStats {
     pub mean_steps: f32,
     pub mean_move_time_ms: f64,
     pub n_episodes: usize,
+    pub games_per_sec: f64,
 }
